@@ -60,9 +60,9 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Generated brand-mark icons (favicon/apple-touch/PWA) — same rationale as
-        // /assets above, plus they're cheap ImageResponse renders worth caching hard.
-        source: "/(icon|apple-icon|icon-192|icon-512)",
+        // Static favicon/PWA/manifest assets at the public root — same rationale
+        // as /assets above; these are brand files that only change when the logo does.
+        source: "/(favicon.ico|favicon.svg|favicon-16x16.png|favicon-32x32.png|apple-touch-icon.png|android-chrome-192x192.png|android-chrome-512x512.png|mstile-150x150.png|safari-pinned-tab.svg|browserconfig.xml|site.webmanifest|og-image.png)",
         headers: [
           {
             key: "Cache-Control",

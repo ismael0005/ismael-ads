@@ -12,12 +12,29 @@ import { JsonLdScript } from "@/components/common/json-ld-script";
 import { siteConfig } from "@/lib/site-config";
 import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = buildPageMetadata({
+const baseMetadata = buildPageMetadata({
   title: siteConfig.title,
   description: siteConfig.description,
   path: "/",
   absoluteTitle: true,
 });
+
+/** Page-level `openGraph`/`twitter` fully replace the layout's (Next merges Metadata shallowly), so the homepage — the URL actually shared — must restate the exact OG/Twitter copy and image here rather than inherit it. */
+export const metadata: Metadata = {
+  ...baseMetadata,
+  openGraph: {
+    ...baseMetadata.openGraph,
+    title: siteConfig.ogTitle,
+    description: siteConfig.ogDescription,
+    images: [{ url: siteConfig.ogImage, width: 1200, height: 630, alt: siteConfig.ogTitle }],
+  },
+  twitter: {
+    ...baseMetadata.twitter,
+    title: siteConfig.twitterTitle,
+    description: siteConfig.twitterDescription,
+    images: [siteConfig.ogImage],
+  },
+};
 
 export default function HomePage() {
   return (

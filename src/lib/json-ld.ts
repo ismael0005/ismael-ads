@@ -22,6 +22,7 @@ export function organizationSchema() {
     logo: `${siteConfig.url}/assets/logos/logo-icon.png`,
     description: siteConfig.description,
     email: contactInfo.email,
+    telephone: contactInfo.whatsappDisplay,
     sameAs: SAME_AS,
     founder: { "@id": PERSON_ID },
   };
