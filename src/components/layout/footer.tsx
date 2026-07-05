@@ -296,10 +296,32 @@ export function Footer() {
         <FooterBrandCenterpiece />
 
         <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-black/[0.06] pt-7 text-xs text-muted-foreground/80 sm:flex-row dark:border-white/[0.08]">
-          <p className="text-center sm:text-left">
-            © {year} {siteConfig.name}.{" "}
-            <span className="block text-muted-foreground/60 sm:inline"> Built with passion for publishers.</span>
-          </p>
+          <div className="flex flex-col items-center gap-1.5 sm:items-start">
+            <p className="text-center sm:text-left">
+              © {year} {siteConfig.name}.{" "}
+              <span className="block text-muted-foreground/60 sm:inline"> Built with passion for publishers.</span>
+            </p>
+            <a
+              href="https://www.raifaizan.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative inline-flex cursor-pointer items-center gap-1 rounded-sm text-muted-foreground/60 transition-colors duration-300 hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <span>Designed &amp; Developed by</span>
+              <span
+                className={cn(
+                  "relative font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent transition-[filter] duration-300",
+                  "group-hover:[filter:drop-shadow(0_0_6px_rgba(147,51,234,0.5))_drop-shadow(0_0_6px_rgba(56,189,248,0.4))] group-focus-visible:[filter:drop-shadow(0_0_6px_rgba(147,51,234,0.5))_drop-shadow(0_0_6px_rgba(56,189,248,0.4))]"
+                )}
+              >
+                Rai Faizan
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-x-0 -bottom-0.5 h-px scale-x-0 bg-gradient-to-r from-primary to-accent transition-transform duration-300 group-hover:scale-x-100 group-focus-visible:scale-x-100"
+                />
+              </span>
+            </a>
+          </div>
           <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
             {footerLegalLinks.map((link) => (
               <li key={link.href}>

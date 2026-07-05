@@ -5,10 +5,15 @@ import type { NextConfig } from "next";
  * script, the site-wide JSON-LD <script> tags, and the (currently disabled
  * unless NEXT_PUBLIC_GA_ID is set) GA4 loader — tighten to nonce-based
  * script-src once none of those need 'unsafe-inline' anymore.
+ *
+ * 'unsafe-eval' is only added in development — Next/Turbopack's dev-mode
+ * HMR runtime uses eval() for fast refresh. Production never needs it.
  */
+const isDev = process.env.NODE_ENV === "development";
+
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
