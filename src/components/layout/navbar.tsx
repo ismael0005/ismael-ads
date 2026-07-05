@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -30,6 +30,22 @@ const mobileItemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+const dropdownVariants = {
+  hidden: { opacity: 0, y: 8, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring" as const, stiffness: 400, damping: 32, staggerChildren: 0.04, delayChildren: 0.02 },
+  },
+  exit: { opacity: 0, y: 6, scale: 0.98, transition: { duration: 0.12 } },
+};
+
+const dropdownItemVariants = {
+  hidden: { opacity: 0, x: -4 },
+  visible: { opacity: 1, x: 0 },
+};
+
 /** The exact floating-pill glass treatment specified for the header — distinct rgba values per theme, not the shared `glass` tokens used elsewhere on the site. */
 const FLOATING_GLASS =
   "border border-black/[0.07] bg-[rgba(255,255,255,0.78)] shadow-[0_8px_32px_-12px_rgba(15,23,42,0.25)] backdrop-blur-xl dark:border-white/10 dark:bg-[rgba(12,15,32,0.72)] dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.65)]";
@@ -39,6 +55,19 @@ export function Navbar() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileToggleRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMobileOpen(false);
+        mobileToggleRef.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [mobileOpen]);
 
   return (
     <header className="sticky top-0 z-50 w-full">
@@ -46,7 +75,7 @@ export function Navbar() {
         <div className={cn(FLOATING_GLASS, "relative flex h-16 items-center justify-between rounded-full px-3 sm:h-[4.25rem] sm:px-4")}>
           <Logo className="pl-1" onClick={() => setMobileOpen(false)} />
 
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
             {mainNav.map((item) => {
               const active = isItemActive(pathname, item.href);
               const open = openDropdown === item.label;
@@ -63,12 +92,22 @@ export function Navbar() {
                     setHoveredItem(null);
                     if (item.children) setOpenDropdown(null);
                   }}
+                  onFocus={() => item.children && setOpenDropdown(item.label)}
+                  onBlur={(event) => {
+                    if (item.children && !event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                      setOpenDropdown(null);
+                    }
+                  }}
+                  onKeyDown={(event) => {
+                    if (item.children && event.key === "Escape") {
+                      setOpenDropdown(null);
+                      event.currentTarget.querySelector("a")?.focus();
+                    }
+                  }}
                 >
                   <Link
                     href={item.href}
                     aria-expanded={item.children ? open : undefined}
-                    onFocus={() => item.children && setOpenDropdown(item.label)}
-                    onBlur={() => item.children && setOpenDropdown(null)}
                     className={cn(
                       "relative flex items-center gap-1 rounded-full px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground",
                       active && "font-semibold text-foreground"
@@ -78,7 +117,7 @@ export function Navbar() {
                       <motion.span
                         layoutId="navbar-hover-pill"
                         transition={{ type: "spring", stiffness: 420, damping: 32 }}
-                        className="absolute inset-0 -z-10 rounded-full bg-black/[0.05] dark:bg-white/[0.07]"
+                        className="absolute inset-0 -z-10 rounded-full bg-black/[0.05] shadow-[0_0_16px_-2px_rgba(109,40,217,0.25)] dark:bg-white/[0.07] dark:shadow-[0_0_16px_-2px_rgba(109,40,217,0.45)]"
                       />
                     )}
                     <motion.span whileHover={{ y: -1 }} className="flex items-center gap-1">
@@ -93,7 +132,7 @@ export function Navbar() {
                     {active && (
                       <motion.span
                         layoutId="navbar-active-underline"
-                        className="absolute inset-x-3.5 -bottom-0.5 h-px bg-gradient-to-r from-primary via-secondary to-accent shadow-[0_0_8px_1px_rgba(109,40,217,0.6)]"
+                        className="absolute inset-x-3.5 -bottom-0.5 h-[1.5px] rounded-full bg-gradient-to-r from-primary via-secondary to-accent shadow-[0_0_10px_1.5px_rgba(109,40,217,0.7)]"
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
@@ -102,10 +141,10 @@ export function Navbar() {
                   <AnimatePresence>
                     {item.children && open && (
                       <motion.div
-                        initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                        transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                        variants={dropdownVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
                         style={{ transformOrigin: "top" }}
                         className={cn(
                           glass.base,
@@ -114,20 +153,21 @@ export function Navbar() {
                         )}
                       >
                         {item.children.map((child) => (
-                          <Link
-                            key={child.href}
-                            href={child.href}
-                            className="group/item block rounded-xl px-3.5 py-2.5 text-sm transition-colors duration-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
-                          >
-                            <div className="font-medium text-foreground transition-colors duration-200 group-hover/item:text-primary-text">
-                              {child.label}
-                            </div>
-                            {child.description && (
-                              <div className="mt-0.5 text-xs text-muted-foreground">
-                                {child.description}
+                          <motion.div key={child.href} variants={dropdownItemVariants}>
+                            <Link
+                              href={child.href}
+                              className="group/item block rounded-xl px-3.5 py-2.5 text-sm transition-colors duration-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                            >
+                              <div className="font-medium text-foreground transition-colors duration-200 group-hover/item:text-primary-text">
+                                {child.label}
                               </div>
-                            )}
-                          </Link>
+                              {child.description && (
+                                <div className="mt-0.5 text-xs text-muted-foreground">
+                                  {child.description}
+                                </div>
+                              )}
+                            </Link>
+                          </motion.div>
                         ))}
                       </motion.div>
                     )}
@@ -158,6 +198,7 @@ export function Navbar() {
           <div className="flex items-center gap-2 lg:hidden">
             <ThemeToggle />
             <Button
+              ref={mobileToggleRef}
               variant="ghost"
               size="icon"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
@@ -183,6 +224,7 @@ export function Navbar() {
               className={cn(FLOATING_GLASS, "mt-2 overflow-hidden rounded-3xl lg:hidden")}
             >
               <motion.nav
+                aria-label="Primary"
                 variants={mobileListVariants}
                 initial="hidden"
                 animate="visible"

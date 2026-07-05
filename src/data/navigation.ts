@@ -77,6 +77,7 @@ export const footerSolutionsLinks: FooterLink[] = [
   { label: "Web Monetization", href: "/solutions/web-monetization" },
   { label: "App Monetization", href: "/solutions/app-monetization" },
   { label: "CTV Monetization", href: "/solutions/ctv-monetization" },
+  { label: "Ad Formats", href: "/ad-formats" },
 ];
 
 export const footerLegalLinks: FooterLink[] = [

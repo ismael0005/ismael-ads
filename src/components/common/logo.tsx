@@ -21,7 +21,7 @@ export function Logo({ className, onClick }: LogoProps) {
       <motion.span
         whileHover={{ rotate: 4, scale: 1.08 }}
         transition={{ type: "spring", stiffness: 300, damping: 15 }}
-        className="relative h-10 w-14 shrink-0"
+        className="relative h-11 w-[3.92rem] shrink-0"
       >
         <span
           aria-hidden="true"
@@ -31,16 +31,22 @@ export function Logo({ className, onClick }: LogoProps) {
           src="/assets/logos/logo-icon.png"
           alt="Ismael Ads"
           fill
-          priority
-          sizes="56px"
+          preload
+          sizes="64px"
           className="object-contain"
         />
       </motion.span>
       <span
-        style={{ letterSpacing: "0.3px" }}
-        className="bg-gradient-to-r from-primary to-accent bg-clip-text font-heading text-lg font-bold whitespace-nowrap text-transparent uppercase"
+        style={{ letterSpacing: "0.8px" }}
+        className="font-heading text-xl font-black whitespace-nowrap uppercase"
       >
-        Ismael Ads
+        <span className="text-foreground">Ismael </span>
+        <span
+          style={{ filter: "drop-shadow(0 0 6px rgba(109,40,217,0.4))" }}
+          className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"
+        >
+          Ads
+        </span>
       </span>
     </Link>
   );
